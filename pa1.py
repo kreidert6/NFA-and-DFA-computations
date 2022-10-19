@@ -5,7 +5,7 @@
 
 import sys
 
-class NFA:
+class DFA:
 	""" Simulates a DFA """
 
 	def __init__(self, filename):
@@ -23,55 +23,15 @@ class NFA:
 		next_line = ''
 		# loop through transition function values until start state
 		while trans_val:
-			
 			next_line = file.readline().rstrip()
 			# check if the line is a transition function
 			if apostrophe in next_line:
 				temp = next_line.split()
-				
-				#replace the key value to include new state
-				if (temp[0] + temp[1]) in self.transition_funcs:
-					self.transition_funcs.get(temp[0]+temp[1]).append(temp[2])
-
-				#first dictionary entry for this transition function
-				else:
-					temp_value_list =[]
-					temp_value_list.append(temp[2])
-					self.transition_funcs[temp[0]+temp[1]]= temp_value_list
-
+				self.transition_funcs[temp[0]+temp[1]]=temp[2]
 			else:
 				trans_val = False
-
-		
-
-		blank_line = file.readline() #step 4
-		self.start_state = next_line #step 5
-		
-
+		self.start_state = next_line
 		self.accept_states = file.readline().rstrip().split()
-		toDFA(self)
-		print(self.transition_funcs)
-
-
-
-
-
-	def toDFA(self, dfa_filename):
-		"""
-		Converts the "self" NFA into an equivalent DFA
-		and writes it to the file whose name is dfa_filename.
-		The format of the DFA file must have the same format
-		as described in the first programming assignment (pa1).
-		This file must be able to be opened and simulated by your
-		pa1 program.
-
-		This function should not read in the NFA file again.  It should
-		create the DFA from the internal representation of the NFA that you 
-		created in __init__.
-		"""
-
-
-
 
 	def simulate(self, str):
 		""" 
