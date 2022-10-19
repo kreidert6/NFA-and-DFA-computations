@@ -5,7 +5,7 @@
 
 import sys
 
-class DFA:
+class NFA:
 	""" Simulates a DFA """
 
 	def __init__(self, filename):
@@ -23,15 +23,36 @@ class DFA:
 		next_line = ''
 		# loop through transition function values until start state
 		while trans_val:
+			
 			next_line = file.readline().rstrip()
 			# check if the line is a transition function
 			if apostrophe in next_line:
 				temp = next_line.split()
-				self.transition_funcs[temp[0]+temp[1]]=temp[2]
+				
+				#replace the key value to include new state
+				if (temp[0] + temp[1]) in self.transition_funcs:
+					self.transition_funcs.get(temp[0]+temp[1]).append(temp[2])
+
+				#first dictionary entry for this transition function
+				else:
+					temp_value_list =[]
+					temp_value_list.append(temp[2])
+					self.transition_funcs[temp[0]+temp[1]]= temp_value_list
+
 			else:
 				trans_val = False
-		self.start_state = next_line
+
+		
+
+		blank_line = file.readline() #step 4
+		self.start_state = next_line #step 5
+		
+
 		self.accept_states = file.readline().rstrip().split()
+
+		print(self.transition_funcs)
+
+
 
 	def simulate(self, str):
 		""" 
