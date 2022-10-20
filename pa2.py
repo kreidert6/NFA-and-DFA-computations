@@ -138,14 +138,16 @@ class NFA:
 
 
 	def generate_new_states(self, current_state):
-		destinations = ['']
+		#destinations = []
 
 		for i in range(len(self.alphabet)):
+			destinations = []
 			for x in range(len(current_state)):
 				search_key = current_state[x] + "'" + self.alphabet[i] + "'"
 				if search_key in self.NFAtransition_funcs:
 
-					destinations = destinations + self.NFAtransition_funcs[search_key]
+					temp = self.NFAtransition_funcs[search_key]
+					destinations += temp
 					
 				
 
