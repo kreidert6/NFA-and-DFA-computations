@@ -52,6 +52,7 @@ class NFA:
 		self.DFAtransition_funcs = {}
 		self.new_state_list = []
 		self.total_states_to_loop = []
+		self.visited_states = []
 		
 
 		self.accept_states = file.readline().rstrip().split()
@@ -106,7 +107,7 @@ class NFA:
 		print(start_states)
 
 
-		self.generate_new_states(start_states)
+		self.generate_new_states()
 
 
 
@@ -139,32 +140,39 @@ class NFA:
 
 
 
-	def generate_new_states(self, current_state):
+	def generate_new_states(self):
 		#destinations = []
-		#while len(self.total_states_to_loop) > 0:
-
-			for i in range(len(self.alphabet)):
-				destinations = []
-				for x in range(len(current_state)):
-					search_key = current_state[x] + "'" + self.alphabet[i] + "'"
-					if search_key in self.NFAtransition_funcs:
-
-						temp = self.NFAtransition_funcs[search_key]
-						destinations += temp
-						
-					
-
-				destinations = list(dict.fromkeys(destinations))
-				destinations.sort( key = int ) 
-
-				current_state = ",".join(current_state)
-				destinations = ",".join(destinations)
-				key_entry = current_state + " '" + str(i) + "' " 
-				self.DFAtransition_funcs[key_entry] = destinations
-
+		while len(self.total_states_to_loop) > 0:
 			
-			print("CHECK THIS!!!!!!")
-			print(self.DFAtransition_funcs)
+			current_state = self.total_states_to_loop.pop()
+			if current_state not in self.visited_states:
+				self.visited_states.append(current_state)
+				for i in range(len(self.alphabet)):
+					destinations = []
+					for x in range(len(current_state)):
+						search_key = current_state[x] + "'" + self.alphabet[i] + "'"
+						if search_key in self.NFAtransition_funcs:
+
+							temp = self.NFAtransition_funcs[search_key]
+							destinations += temp
+							
+						
+					#gets rid of duplicates
+					destinations = list(dict.fromkeys(destinations))
+					destinations.sort( key = int ) 
+
+					self.total_states_to_loop.append(destinations)
+					
+					current_state = ",".join(current_state)
+					destinations = ",".join(destinations)
+
+
+					key_entry = current_state + " '" + str(i) + "' " 
+					self.DFAtransition_funcs[key_entry] = destinations
+
+				
+		print("CHECK THIS!!!!!!")
+		print(self.DFAtransition_funcs)
 
 
 		
