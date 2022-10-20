@@ -18,7 +18,7 @@ class NFA:
 		# open and read the file
 		file = open(filename, 'r')
 		self.states = file.readline().rstrip()
-		self.alphabet = file.readline().rstrip()+"e"
+		self.alphabet = file.readline().rstrip()
 		apostrophe = "'"
 		self.NFAtransition_funcs = {}
 		trans_val = True
@@ -52,6 +52,7 @@ class NFA:
 		self.DFAtransition_funcs = {}
 		self.new_state_list = []
 		self.total_states_to_loop = []
+		self.total_states_to_loop.append('0')
 		self.visited_states = []
 		
 
@@ -99,9 +100,9 @@ class NFA:
 			
 			epsilon_additions = self.NFAtransition_funcs[temp]
 			start_states = list(set(start_states) | set(epsilon_additions))
+		start_states.sort( key = int)
 		self.total_states_to_loop.append(start_states)
 		print(start_states)
-		start_states.sort( key = int)
 		
 		print("NFA start state - " + self.start_state)
 		print(start_states)
