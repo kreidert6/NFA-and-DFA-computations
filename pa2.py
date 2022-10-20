@@ -163,16 +163,18 @@ class NFA:
 
 					self.total_states_to_loop.append(destinations)
 					
-					current_state = ",".join(current_state)
-					destinations = ",".join(destinations)
+					current_state = "".join(current_state)
+					destinations = "".join(destinations)
 
 
 					key_entry = current_state + " '" + str(i) + "' " 
 					self.DFAtransition_funcs[key_entry] = destinations
 
 				
+				
 		print("CHECK THIS!!!!!!")
 		print(self.DFAtransition_funcs)
+			
 
 
 		
