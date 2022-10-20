@@ -33,12 +33,12 @@ class NFA:
 				
 				#replace the key value to include new state
 				if (temp[0] + temp[1]) in self.NFAtransition_funcs:
-					self.NFAtransition_funcs.get(temp[0]+temp[1]).append(int(temp[2]))
+					self.NFAtransition_funcs.get(temp[0]+temp[1]).append(temp[2])
 
 				#first dictionary entry for this transition function
 				else:
 					temp_value_list =[]
-					temp_value_list.append(int(temp[2]))
+					temp_value_list.append(temp[2])
 					self.NFAtransition_funcs[temp[0]+temp[1]]= temp_value_list
 
 			else:
@@ -46,10 +46,10 @@ class NFA:
 
 		
 
-		blank_line = file.readline() #step 4
-		self.start_state = next_line #step 5
+		#blank_line = file.readline() #step 4
+		self.start_state = file.readline().rstrip() #step 5
 
-		self.DFA_dict = {}
+		self.DFAtransition_funcs = {}
 		self.new_state_list = []
 		
 
@@ -89,13 +89,26 @@ class NFA:
 		created in __init__.
 		"""
 
+		#get start states including epsilons 
 		start_states = []
 		start_states.append(self.start_state)
-
-		temp = self.start_state + "'e" 
-
+		temp = self.start_state + "'e'" 
 		if temp in self.NFAtransition_funcs:
 			
+			epsilon_additions = self.NFAtransition_funcs[temp]
+			start_states = list(set(start_states) | set(epsilon_additions))
+		print(start_states)
+		start_states.sort( key = int)
+		
+		print("NFA start state - " + self.start_state)
+		print(start_states)
+
+
+		generate_new_states(self, start_states)
+
+
+
+
 
 
 
@@ -124,6 +137,25 @@ class NFA:
 
 
 
+	def generate_new_states(self, current_state):
+		destinations = []
+
+		for i in range(len(self.alphabet)):
+			for x in range(len(current_state)):
+				search_key = current_state[x] + "'" + self.alphabet[i] + "'"
+				if search_key in self.NFAtransition_funcs:
+
+					destinations = destinations + self.NFAtransition_funcs[search_key]
+					
+				
+
+			destinations = list(dict.fromkeys(destinations))
+			destinations.sort( key = int ) 
+
+			self.DFAtransition_funcs[current_state] = destinations
+
+
+		
 
 
 	def simulate(self, str):
