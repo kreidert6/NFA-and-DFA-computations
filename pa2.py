@@ -104,7 +104,7 @@ class NFA:
 		print(start_states)
 
 
-		generate_new_states(self, start_states)
+		self.generate_new_states(start_states)
 
 
 
@@ -138,7 +138,7 @@ class NFA:
 
 
 	def generate_new_states(self, current_state):
-		destinations = []
+		destinations = ['']
 
 		for i in range(len(self.alphabet)):
 			for x in range(len(current_state)):
@@ -152,7 +152,14 @@ class NFA:
 			destinations = list(dict.fromkeys(destinations))
 			destinations.sort( key = int ) 
 
-			self.DFAtransition_funcs[current_state] = destinations
+			current_state = ",".join(current_state)
+			destinations = ",".join(destinations)
+			key_entry = current_state + " '" + str(i) + "' " 
+			self.DFAtransition_funcs[key_entry] = destinations
+
+		
+		print("CHECK THIS!!!!!!")
+		print(self.DFAtransition_funcs)
 
 
 		
