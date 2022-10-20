@@ -3,7 +3,9 @@
 # Date: 09/28/2022
 # Description: A Python 3 program that simulates the computation of a DFA M on an input string s, and reports if s is accepted by M.
 
+from re import search
 import sys
+from tracemalloc import start
 
 class NFA:
 	""" Simulates a DFA """
@@ -18,7 +20,7 @@ class NFA:
 		self.states = file.readline().rstrip()
 		self.alphabet = file.readline().rstrip()
 		apostrophe = "'"
-		self.transition_funcs = {}
+		self.NFAtransition_funcs = {}
 		trans_val = True
 		next_line = ''
 		# loop through transition function values until start state
@@ -30,14 +32,14 @@ class NFA:
 				temp = next_line.split()
 				
 				#replace the key value to include new state
-				if (temp[0] + temp[1]) in self.transition_funcs:
-					self.transition_funcs.get(temp[0]+temp[1]).append(temp[2])
+				if (temp[0] + temp[1]) in self.NFAtransition_funcs:
+					self.NFAtransition_funcs.get(temp[0]+temp[1]).append(int(temp[2]))
 
 				#first dictionary entry for this transition function
 				else:
 					temp_value_list =[]
-					temp_value_list.append(temp[2])
-					self.transition_funcs[temp[0]+temp[1]]= temp_value_list
+					temp_value_list.append(int(temp[2]))
+					self.NFAtransition_funcs[temp[0]+temp[1]]= temp_value_list
 
 			else:
 				trans_val = False
@@ -46,13 +48,30 @@ class NFA:
 
 		blank_line = file.readline() #step 4
 		self.start_state = next_line #step 5
+
+		self.DFA_dict = {}
+		self.new_state_list = []
 		
 
 		self.accept_states = file.readline().rstrip().split()
-		toDFA(self)
-		print(self.transition_funcs)
+		#toDFA(self)
+		print(self.alphabet)
+		print(self.NFAtransition_funcs)
 
 
+
+	# def generate_new_states(self, current_state, i):
+		
+	# 		for x in range(current_states.length)
+	# 		search_key = (self.current_state) + "'" + self.alphabet[i]
+
+			
+	# 		if search_key in self.NFAtransition_funcs:
+	# 				new_state_list = self.NFAtransition_funcs.get(search_key)
+	# 				#add new state to new DFA dictionary 
+	# 				self.DFA_dict[search_key] = new_state_list
+		
+		
 
 
 
@@ -70,6 +89,40 @@ class NFA:
 		created in __init__.
 		"""
 
+		start_states = []
+		start_states.append(self.start_state)
+
+		temp = self.start_state + "'e" 
+
+		if temp in self.NFAtransition_funcs:
+			
+
+
+
+
+		# #we need to initialize start state of DFA 
+		# #first_state = self.start_state + dfa_filename + "'" + self.alphabet[0] 
+ 		
+		# #make new states of new DFA
+		
+		# self.new_state_list = []
+		# #for y in range(self.states):
+		# for i in range(self.alphabet):
+		# 		#new_state_list = []
+		# 	current_state = 4
+		# 	self.generate_new_states(current_state, i)
+
+		
+				
+
+
+
+					
+					
+		
+		# return 
+
+
 
 
 
@@ -84,8 +137,8 @@ class NFA:
 		for i in range (len(str)):
 			next_move = curr_state + "\'" + str[i]+ "\'"
 			# confirm if next move is in the transition function
-			if next_move in self.transition_funcs:
-				curr_state = self.transition_funcs[next_move]
+			if next_move in self.NFAtransition_funcs:
+				curr_state = self.NFAtransition_funcs[next_move]
 		# if last state is an accept state, return True, else return False
 		if curr_state in self.accept_states:
 			return True
