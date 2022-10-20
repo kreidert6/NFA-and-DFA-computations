@@ -175,7 +175,8 @@ class NFA:
 
 
 					key_entry = current_state + " '" + str(i) + "' " 
-					self.DFAtransition_funcs[key_entry] = destinations
+					if (current_state != "") & (destinations != ""):
+						self.DFAtransition_funcs[key_entry] = destinations
 
 				
 				
