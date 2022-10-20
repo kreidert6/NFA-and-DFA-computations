@@ -77,48 +77,54 @@ def dfa_file_format_ok(nfa, dfa_filename, nfa_filename):
         return False
     
 if __name__ == "__main__":
-    num_test_files = 14
-    for i in range(1, num_test_files + 1):
-        nfa_filename = f"nfa{i}.txt"
-        dfa_filename = f"dfa{i}.txt"
-        input_filename = f"str{i}.txt"
-        correct_results_filename = f"correct{i}.txt"
+    # num_test_files = 14
+    # for i in range(1, num_test_files + 1):
+    #     nfa_filename = f"nfa{i}.txt"
+    #     dfa_filename = f"dfa{i}.txt"
+    #     input_filename = f"str{i}.txt"
+    #     correct_results_filename = f"correct{i}.txt"
 
-        print(f"Testing NFA {nfa_filename} on strings from {input_filename}")
-        try:
-            # Create NFA
-            nfa = pa2.NFA(nfa_filename)
+   
+    nfa_filename = f"nfa{3}.txt"
+    dfa_filename = f"dfa{3}.txt"
+    input_filename = f"str{3}.txt"
+    correct_results_filename = f"correct{3}.txt"
 
-            # Convert to DFA
-            nfa.toDFA(dfa_filename)
+    print(f"Testing NFA {nfa_filename} on strings from {input_filename}")
+    try:
+        # Create NFA
+        nfa = pa2.NFA(nfa_filename)
 
-            # Check the format of the DFA file
-            if not dfa_file_format_ok(nfa, dfa_filename, nfa_filename):
-                print("  DFA file has incorrect format")
+        # Convert to DFA
+        nfa.toDFA(dfa_filename)
+
+        # Check the format of the DFA file
+        if not dfa_file_format_ok(nfa, dfa_filename, nfa_filename):
+            print("  DFA file has incorrect format")
+        else:
+            # Create the DFA
+            dfa = pa1.DFA(dfa_filename)
+
+            # Open string file.
+            string_file = open(input_filename)
+
+            # Simulate DFA on test strings
+            results = []
+            for str in string_file:
+                results.append(dfa.simulate(str.strip()))
+
+            # Get correct results
+            correct_results = read_results_file(correct_results_filename)
+
+            # Check if correct
+            if results == correct_results:
+                print("  Correct results")
             else:
-                # Create the DFA
-                dfa = pa1.DFA(dfa_filename)
-
-                # Open string file.
-                string_file = open(input_filename)
-
-                # Simulate DFA on test strings
-                results = []
-                for str in string_file:
-                    results.append(dfa.simulate(str.strip()))
-
-                # Get correct results
-                correct_results = read_results_file(correct_results_filename)
-
-                # Check if correct
-                if results == correct_results:
-                    print("  Correct results")
-                else:
-                    print("  Incorrect results")
-                    print(f"  Your results = {results}")
-                    print(f"  Correct results = {correct_results}")
-                print()
-        except OSError as err:
-            print(f"Could not open file: {err}")
-        #except Exception as err:
-        #    print(f"Error simulating dfa: {err}")
+                print("  Incorrect results")
+                print(f"  Your results = {results}")
+                print(f"  Correct results = {correct_results}")
+            print()
+    except OSError as err:
+        print(f"Could not open file: {err}")
+    #except Exception as err:
+    #    print(f"Error simulating dfa: {err}")

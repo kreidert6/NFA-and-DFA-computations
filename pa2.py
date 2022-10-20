@@ -151,14 +151,18 @@ class NFA:
 				for i in range(len(self.alphabet)):
 					destinations = []
 					for x in range(len(current_state)):
-						print(self.alphabet[i])
+						
 						search_key = current_state[x] + "'" + self.alphabet[i] + "'"
 						if search_key in self.NFAtransition_funcs:
 
 							temp = self.NFAtransition_funcs[search_key]
 							destinations += temp
-							
 						
+						destinations += self.add_epsilons(current_state[x])
+						
+						for item in destinations:
+							destinations += self.add_epsilons(item)
+							
 					#gets rid of duplicates
 					destinations = list(dict.fromkeys(destinations))
 					destinations.sort( key = int ) 
@@ -177,6 +181,15 @@ class NFA:
 		print("CHECK THIS!!!!!!")
 		print(self.DFAtransition_funcs)
 			
+
+	def add_epsilons(self, x):
+		end_state = []
+		key = x + "'e'"
+		if key in self.NFAtransition_funcs:
+		
+				end_state = self.NFAtransition_funcs[key]
+
+		return end_state
 
 
 		
