@@ -51,6 +51,7 @@ class NFA:
 
 		self.DFAtransition_funcs = {}
 		self.new_state_list = []
+		self.total_states_to_loop = []
 		
 
 		self.accept_states = file.readline().rstrip().split()
@@ -97,6 +98,7 @@ class NFA:
 			
 			epsilon_additions = self.NFAtransition_funcs[temp]
 			start_states = list(set(start_states) | set(epsilon_additions))
+		self.total_states_to_loop.append(start_states)
 		print(start_states)
 		start_states.sort( key = int)
 		
@@ -139,29 +141,30 @@ class NFA:
 
 	def generate_new_states(self, current_state):
 		#destinations = []
+		#while len(self.total_states_to_loop) > 0:
 
-		for i in range(len(self.alphabet)):
-			destinations = []
-			for x in range(len(current_state)):
-				search_key = current_state[x] + "'" + self.alphabet[i] + "'"
-				if search_key in self.NFAtransition_funcs:
+			for i in range(len(self.alphabet)):
+				destinations = []
+				for x in range(len(current_state)):
+					search_key = current_state[x] + "'" + self.alphabet[i] + "'"
+					if search_key in self.NFAtransition_funcs:
 
-					temp = self.NFAtransition_funcs[search_key]
-					destinations += temp
+						temp = self.NFAtransition_funcs[search_key]
+						destinations += temp
+						
 					
-				
 
-			destinations = list(dict.fromkeys(destinations))
-			destinations.sort( key = int ) 
+				destinations = list(dict.fromkeys(destinations))
+				destinations.sort( key = int ) 
 
-			current_state = ",".join(current_state)
-			destinations = ",".join(destinations)
-			key_entry = current_state + " '" + str(i) + "' " 
-			self.DFAtransition_funcs[key_entry] = destinations
+				current_state = ",".join(current_state)
+				destinations = ",".join(destinations)
+				key_entry = current_state + " '" + str(i) + "' " 
+				self.DFAtransition_funcs[key_entry] = destinations
 
-		
-		print("CHECK THIS!!!!!!")
-		print(self.DFAtransition_funcs)
+			
+			print("CHECK THIS!!!!!!")
+			print(self.DFAtransition_funcs)
 
 
 		
