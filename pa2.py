@@ -18,7 +18,7 @@ class NFA:
 		# open and read the file
 		file = open(filename, 'r')
 		self.states = file.readline().rstrip()
-		self.alphabet = file.readline().rstrip()
+		self.alphabet = file.readline().rstrip()+"e"
 		apostrophe = "'"
 		self.NFAtransition_funcs = {}
 		trans_val = True
@@ -142,6 +142,7 @@ class NFA:
 
 	def generate_new_states(self):
 		#destinations = []
+		print(self.alphabet)
 		while len(self.total_states_to_loop) > 0:
 			
 			current_state = self.total_states_to_loop.pop()
@@ -150,6 +151,7 @@ class NFA:
 				for i in range(len(self.alphabet)):
 					destinations = []
 					for x in range(len(current_state)):
+						print(self.alphabet[i])
 						search_key = current_state[x] + "'" + self.alphabet[i] + "'"
 						if search_key in self.NFAtransition_funcs:
 
