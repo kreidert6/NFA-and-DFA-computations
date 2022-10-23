@@ -84,12 +84,6 @@ if __name__ == "__main__":
         input_filename = f"str{i}.txt"
         correct_results_filename = f"correct{i}.txt"
 
-   
-    # nfa_filename = f"nfa{3}.txt"
-    # dfa_filename = f"dfa{3}.txt"
-    # input_filename = f"str{3}.txt"
-    # correct_results_filename = f"correct{3}.txt"
-
         print(f"Testing NFA {nfa_filename} on strings from {input_filename}")
         try:
             # Create NFA

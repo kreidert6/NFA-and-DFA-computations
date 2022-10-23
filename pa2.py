@@ -1,82 +1,49 @@
-# Name: pa1.py
+# Name: pa2.py
 # Author(s): Tyler Kreider and Julia Paley
-# Date: 09/28/2022
-# Description: A Python 3 program that simulates the computation of a DFA M on an input string s, and reports if s is accepted by M.
+# Date Written: 10/15/2022 
+# Description: Reads an NFA specification from another file, converts the NFA to an equivalent DFA, and writes the DFA to a file.
 
-from re import search
-import sys
-from tracemalloc import start
 
 class NFA:
-	""" Simulates a DFA """
+	""" Simulates an NFA """
 
 	def __init__(self, filename):
 		"""
-		Initializes DFA from the file whose name is
+		Initializes NFA from the file whose name is
 		filename
 		"""
 		# open and read the file
 		file = open(filename, 'r')
-		self.states = file.readline().rstrip()
+		self.total_nfa_states = int(file.readline().rstrip())
 		self.alphabet = file.readline().rstrip()
 		apostrophe = "'"
-		self.NFAtransition_funcs = {}
+		self.nfa_trans_funcs = {}
 		trans_val = True
 		next_line = ''
+
 		# loop through transition function values until start state
 		while trans_val:
-			
 			next_line = file.readline().rstrip()
 			# check if the line is a transition function
 			if apostrophe in next_line:
-				temp = next_line.split()
-				
+				trans_vals = next_line.split()
 				#replace the key value to include new state
-				if (temp[0] + temp[1]) in self.NFAtransition_funcs:
-					self.NFAtransition_funcs.get(temp[0]+temp[1]).append(temp[2])
-
+				if (trans_vals[0] + trans_vals[1]) in self.nfa_trans_funcs:
+					self.nfa_trans_funcs.get(trans_vals[0]+trans_vals[1]).append(trans_vals[2])
 				#first dictionary entry for this transition function
 				else:
-					temp_value_list =[]
-					temp_value_list.append(temp[2])
-					self.NFAtransition_funcs[temp[0]+temp[1]]= temp_value_list
-
+					temp_value_list = [trans_vals[2]]
+					self.nfa_trans_funcs[trans_vals[0]+trans_vals[1]]= temp_value_list
 			else:
 				trans_val = False
 
-		
-
-		#blank_line = file.readline() #step 4
-		self.start_state = file.readline().rstrip() #step 5
-
-		self.DFAtransition_funcs = {}
-		self.new_state_list = []
-		self.total_states_to_loop = []
-		self.total_states_to_loop.append('0')
-		self.visited_states = []
-		
-
+		self.start_state = file.readline().rstrip()
 		self.accept_states = file.readline().rstrip().split()
-		#toDFA(self)
-		print(self.alphabet)
-		print(self.NFAtransition_funcs)
-
-
-
-	# def generate_new_states(self, current_state, i):
-		
-	# 		for x in range(current_states.length)
-	# 		search_key = (self.current_state) + "'" + self.alphabet[i]
-
-			
-	# 		if search_key in self.NFAtransition_funcs:
-	# 				new_state_list = self.NFAtransition_funcs.get(search_key)
-	# 				#add new state to new DFA dictionary 
-	# 				self.DFA_dict[search_key] = new_state_list
-		
-		
-
-
+		# initialize needed variables
+		self.dfa_trans_funcs = {}
+		self.dfa_accept_sts = []
+		self.dfa_start_st = 0
+		self.total_states = 0
 
 	def toDFA(self, dfa_filename):
 		"""
@@ -91,131 +58,134 @@ class NFA:
 		create the DFA from the internal representation of the NFA that you 
 		created in __init__.
 		"""
-
-		#get start states including epsilons 
-		start_states = []
-		start_states.append(self.start_state)
-		temp = self.start_state + "'e'" 
-		if temp in self.NFAtransition_funcs:
-			
-			epsilon_additions = self.NFAtransition_funcs[temp]
-			start_states = list(set(start_states) | set(epsilon_additions))
-		start_states.sort( key = int)
-		self.total_states_to_loop.append(start_states)
-		print(start_states)
+		dfa_start_states = [self.start_state]
+		dfa_start_states = self.epsilon(dfa_start_states)
+		dfa_start_states = list(dict.fromkeys(dfa_start_states))
+		dfa_start_states.sort( key = int)
+		final_dfa_start = ",".join(dfa_start_states)
+		self.dfa_start_st = final_dfa_start
+		states_to_loop = [final_dfa_start]
 		
-		print("NFA start state - " + self.start_state)
-		print(start_states)
+		# add nfa states to loop through for transition function
+		for single_state in range(1, self.total_nfa_states + 1):
+			states_to_loop.append(str(single_state))
 
-
-		self.generate_new_states()
-
-
-
-
-
-
-
-
-		# #we need to initialize start state of DFA 
-		# #first_state = self.start_state + dfa_filename + "'" + self.alphabet[0] 
- 		
-		# #make new states of new DFA
+		# add start state to accept states if it is an accept state
+		for start_var in dfa_start_states:
+			if start_var in self.accept_states:
+				self.dfa_accept_sts.append(final_dfa_start)
+				break	
 		
-		# self.new_state_list = []
-		# #for y in range(self.states):
-		# for i in range(self.alphabet):
-		# 		#new_state_list = []
-		# 	current_state = 4
-		# 	self.generate_new_states(current_state, i)
-
+		self.create_transitions(states_to_loop)
+		self.dfa_trans_funcs = self.format_to_file()
+		self.WriteToFile(dfa_filename)
 		
-				
 
-
-
-					
-					
-		
-		# return 
-
-
-
-	def generate_new_states(self):
-		#destinations = []
-		print(self.alphabet)
-		while len(self.total_states_to_loop) > 0:
-			
-			current_state = self.total_states_to_loop.pop()
-			if current_state not in self.visited_states:
-				self.visited_states.append(current_state)
-				for i in range(len(self.alphabet)):
-					destinations = []
-					for x in range(len(current_state)):
-						
-						search_key = current_state[x] + "'" + self.alphabet[i] + "'"
-						if search_key in self.NFAtransition_funcs:
-
-							temp = self.NFAtransition_funcs[search_key]
-							destinations += temp
-						
-						destinations += self.add_epsilons(current_state[x])
-						
-						for item in destinations:
-							destinations += self.add_epsilons(item)
-							
-					#gets rid of duplicates
+	def create_transitions(self, total_states_to_loop):
+		"""
+		Loops through total_states_to_loop until every state the DFA visits
+		is in the DFA transition function. Updates the DFA's accept state(s).
+		"""
+		while len(total_states_to_loop) > 0:
+			current_state = total_states_to_loop.pop()
+			current_state = current_state.split(',')
+			# loop through alphabet and get next state transition
+			for i in range(len(self.alphabet)):
+				destinations = []
+				# loop states in current_state and add nfa state to dfa destination state
+				for x in range(len(current_state)): 
+					search_key = current_state[x] + "'" + self.alphabet[i] + "'"
+					if search_key in self.nfa_trans_funcs:
+						destinations.extend(self.nfa_trans_funcs[search_key])
+						destinations = self.epsilon(destinations)
+				#get rid of duplicates
+				if len(destinations) > 1:
 					destinations = list(dict.fromkeys(destinations))
 					destinations.sort( key = int ) 
+				# add state to dfa accept states if the state has an accepting NFA state
+				for potential_accept in destinations:
+					if potential_accept in self.accept_states:
+						self.dfa_accept_sts.append(",".join(destinations))
+						self.dfa_accept_sts = list(dict.fromkeys(self.dfa_accept_sts))
+						break
+				key_entry = ",".join(current_state) + " '" + self.alphabet[i] + "' " 
 
-					self.total_states_to_loop.append(destinations)
-					
-					current_state = "".join(current_state)
-					destinations = "".join(destinations)
-
-
-					key_entry = current_state + " '" + str(i) + "' " 
-					if (current_state != "") & (destinations != ""):
-						self.DFAtransition_funcs[key_entry] = destinations
-
-				
-				
-		print("CHECK THIS!!!!!!")
-		print(self.DFAtransition_funcs)
-			
-
-	def add_epsilons(self, x):
-		end_state = []
-		key = x + "'e'"
-		if key in self.NFAtransition_funcs:
+				# if destination is a reject state
+				if len(destinations) == 0:
+					destinations = '0'
+				else:
+					destinations = ",".join(destinations)
+				# add destination to list of unhandled states 
+				if destinations not in self.dfa_trans_funcs.values():
+					total_states_to_loop.append(destinations) 
+					total_states_to_loop = list(dict.fromkeys(total_states_to_loop))
+				# add new transition function entry
+				self.dfa_trans_funcs[key_entry] = destinations	
 		
-				end_state = self.NFAtransition_funcs[key]
-
-		return end_state
-
-
 		
 
-
-	def simulate(self, str):
-		""" 
-		Simulates the DFA on input str.  Returns
-		True if str is in the language of the DFA,
-		and False if not.
+	def format_to_file(self):
 		"""
-		curr_state = self.start_state
-		# loop through values in input string
-		for i in range (len(str)):
-			next_move = curr_state + "\'" + str[i]+ "\'"
-			# confirm if next move is in the transition function
-			if next_move in self.NFAtransition_funcs:
-				curr_state = self.NFAtransition_funcs[next_move]
-		# if last state is an accept state, return True, else return False
-		if curr_state in self.accept_states:
-			return True
-		else:
-			return False
+		Creates the correct format for the DFA transition function, start state,
+		and accept state(s). Returns the DFA function in the correct format.
+		"""
+		new_mappings = {}
+		new_trans_func = {}
+		state_number = self.total_nfa_states + 1
 
+		# create new mappings for DFA states that are 1 NFA state
+		for i in range(1, state_number):
+			new_mappings[str(i)] = str(i)
 
+		# create mappings for all other DFA states
+		for trans_key in self.dfa_trans_funcs:
+			# DFA transition state is 2+ states or a rejecting state
+			if trans_key[:-5] not in new_mappings:
+				new_mappings[trans_key[:-5]] = str(state_number)
+				state_number += 1
 
+		# loop through DFA transition function keys and fix format in transition function
+		for trans_key in self.dfa_trans_funcs:
+			new_value = new_mappings[trans_key[:-5]] + " " + trans_key[-4:-1] + " "
+			new_trans_func[new_value] = new_mappings[self.dfa_trans_funcs[trans_key]]
+		
+		# fix format for start state
+		self.dfa_start_st = new_mappings[self.dfa_start_st]
+
+		# fix format for accept states
+		for i in range(len(self.dfa_accept_sts)):
+			self.dfa_accept_sts[i] = new_mappings[self.dfa_accept_sts[i]]
+
+		# get total number of states
+		max_state_val = [eval(state) for state in list(new_mappings.values())]
+		self.total_states = int(max(max_state_val))
+
+		return new_trans_func
 	
+	def epsilon(self, states_list):
+		"""
+		Adds all epsilon transition states to the destination or start state.
+		Returns list of all states epsilon leads to.
+		"""
+		for i in range(len(states_list)):
+			epsilon_trans =  states_list[i] + "'e'"
+			if epsilon_trans in self.nfa_trans_funcs:
+				states_list.extend(self.nfa_trans_funcs[epsilon_trans])
+				# recursion for unlimited epsilons
+				states_list.extend(self.epsilon(self.nfa_trans_funcs[epsilon_trans]))
+		return states_list
+
+
+	def WriteToFile(self, dfa_filename):
+		"""
+		Writes the created DFA spcifications to the file dfa_filename in the format from pa1.
+		"""
+		new_file = open(dfa_filename, 'w')
+		new_file.write(str(self.total_states) + '\n')
+		new_file.write(self.alphabet + '\n')
+
+		for trans_func in self.dfa_trans_funcs:
+			new_file.write(trans_func + " " + str(self.dfa_trans_funcs[trans_func]) + '\n')
+
+		new_file.write(self.dfa_start_st + '\n')
+		new_file.write(	" ".join(self.dfa_accept_sts))
